@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6565efb8dd2258340af5e22972cba8f7, type: 3}
   m_Name: PlayerMoveConfig
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMoveConfigSO
-  moveSpeed: 13.5
+  moveSpeed: 6.1
   accelerationTime: 0.04
   decelerationTime: 0.22
   turnSpeed: 18
