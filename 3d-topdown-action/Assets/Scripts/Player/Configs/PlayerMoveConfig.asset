@@ -18,4 +18,5 @@ MonoBehaviour:
   turnSpeed: 18
   maxLeanAngle: 14.47
   leanSmoothing: 12
+  attackVelocityDecrease: 0.7
   gravity: -20
