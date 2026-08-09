@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Squash/tilt için ölçeklenecek/döndürülecek visual child. Boş bırakırsan bu transform kullanılır.")]
     [SerializeField] private Transform visualRoot;
 
+    
     // Cached components
     private PlayerInput playerInput;
     private CharacterController characterController;
@@ -37,11 +38,18 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 MoveInput => moveInput;
     public Vector3 CurrentVelocity => currentVelocity;
     public PlayerMoveConfigSO Config => config;
+    
+    private PlayerAttack playerAttack;
+    private PlayerFacing playerFacing;
 
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
         characterController = GetComponent<CharacterController>();
+        playerAttack = GetComponent<PlayerAttack>();
+        playerFacing = GetComponent<PlayerFacing>();
+        
+
         if (visualRoot == null) visualRoot = transform;
         baseScale = visualRoot.localScale;
     }
@@ -58,6 +66,12 @@ public class PlayerMovement : MonoBehaviour
 
 
         wasMovingLastFrame = isMoving;
+
+        if (playerAttack.CurrentState == AttackState.Windup || playerAttack.CurrentState == AttackState.Active)
+        {
+            // Attack sırasında hareket %30 azalt
+            currentVelocity *= config.attackVelocityDecrease;
+        }
 
         // State transition
         if (isMoving) ChangeState(new MoveState());
@@ -115,24 +129,17 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 horiz = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
 
-        // Facing rotation — sadece hareket varken döner
-        if (horiz.sqrMagnitude > 0.05f)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(horiz.normalized, Vector3.up);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation, targetRot,
-                1f - Mathf.Exp(-config.turnSpeed * Time.deltaTime));
-        }
+        // Facing artık PlayerFacing'in işi — biz sadece hareket yönünü push ederiz
+        if (playerFacing != null)
+            playerFacing.SetMovementDirection(horiz);
 
-        // Lean — hızın oranına göre öne doğru eğilir
+        // Lean — bu hala Movement'ın işi çünkü visual efekt
         float speedRatio = horiz.magnitude / Mathf.Max(0.0001f, config.moveSpeed);
         float targetLean = Mathf.Clamp01(speedRatio) * config.maxLeanAngle;
 
         currentLean = Mathf.Lerp(currentLean, targetLean,
             1f - Mathf.Exp(-config.leanSmoothing * Time.deltaTime));
 
-        // Lean'i visual root'un LOCAL X rotation'ı olarak uygula.
-        // (transform'un kendisi zaten hareket yönüne bakıyor, X ekseni öne doğru = forward tilt)
         visualRoot.localRotation = Quaternion.Euler(currentLean, 0f, 0f);
     }
 

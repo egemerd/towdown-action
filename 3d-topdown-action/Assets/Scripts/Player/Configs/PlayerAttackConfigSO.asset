@@ -12,12 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77509f9f675d26c4c8b06ff3d9e5338c, type: 3}
   m_Name: PlayerAttackConfigSO
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttackConfigSO
-  attackRange: 1.42
-  attackRadius: 0.94
-  attackDamage: 10
-  attackKnockback: 5
-  attackOffset: {x: 0, y: 0, z: 0}
-  attackCooldown: 0.5
-  enemyLayer:
+  damage: 10
+  knockbackForce: 5
+  range: 1.5
+  radius: 1.2
+  offset: {x: 0, y: 0, z: 0}
+  targetLayer:
     serializedVersion: 2
     m_Bits: 16384
+  windupDuration: 0.06
+  activeDuration: 0.1
+  recoveryDuration: 0.2
+  cancelWindowStart: 0.05
+  hitStopDuration: 0.06
+  shakeMagnitude: 0.3
+  shakeDuration: 0.15

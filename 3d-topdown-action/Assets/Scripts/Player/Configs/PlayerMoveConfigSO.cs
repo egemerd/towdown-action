@@ -22,6 +22,7 @@ public class PlayerMoveConfigSO : ScriptableObject
     [Tooltip("Lean'in hedef deðere ulaþma smoothness'ý.")]
     public float leanSmoothing = 12f;
 
+    public float attackVelocityDecrease = 0.5f; // attack sýrasýnda hýzýn ne kadar düþeceði (0-1)
     //[Header("— Squash & Stretch —")]
     //[Tooltip("Hareket baþlarken uygulanacak stretch scale (x/y/z). Kýsa süreli pulse.")]
     //public Vector3 startStretch = new Vector3(0.9f, 1.15f, 0.9f);
