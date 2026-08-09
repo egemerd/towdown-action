@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_Enemy 1
+  m_Name: Player
   m_Shader: {fileID: -6465566751694194690, guid: bbd0410a5c6bd7c4cbb7cc67ced58e1c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -49,7 +49,7 @@ Material:
     - _MaskTiling: 1.87
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _ShadowStep: 0.96
+    - _ShadowStep: 0.63
     - _WaveAmplitude: 2.94
     - _WaveFrequency: 1.06
     - _WaveSpeed: 3.56

@@ -2,15 +2,25 @@ using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    float moveSpeed = 2f;
-    float distanceToStop = 1f;
-    [SerializeField] Transform target;
+    [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private Transform target;
+
+    private EnemyKnockback knockback;
+
+    private void Awake()
+    {
+        knockback = GetComponent<EnemyKnockback>();
+    }
 
     private void Update()
     {
-        if (Vector3.Distance(transform.position, target.position) > distanceToStop)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
-        }
+        // Knockback aktifse hareket etme — knockback pozisyonu kendi uygular
+        if (knockback != null && knockback.IsKnockedBack) return;
+        if (target == null) return;
+
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            target.position,
+            moveSpeed * Time.deltaTime);
     }
 }
