@@ -638,6 +638,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyProjectileAttack (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     - target: {fileID: 8376020240925824020, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.03
@@ -923,6 +927,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyProjectileAttack (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     - target: {fileID: 8376020240925824020, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.12
@@ -7729,6 +7737,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyProjectileAttack (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     - target: {fileID: 8376020240925824020, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.83
@@ -8012,7 +8024,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3716927711885150832, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5329503020023536918, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
       propertyPath: target
@@ -8058,6 +8070,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8819947477008369937, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8275,7 +8291,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3716927711885150832, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5329503020023536918, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
       propertyPath: target
@@ -8321,6 +8337,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8819947477008369937, guid: ab184d4995bf1454a8ef8912fbe79b50, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8403,6 +8423,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyProjectileAttack
       objectReference: {fileID: 0}
+    - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1353268255}
     - target: {fileID: 8376020240925824020, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.83

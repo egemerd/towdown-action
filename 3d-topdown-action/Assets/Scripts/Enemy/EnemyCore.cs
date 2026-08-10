@@ -14,6 +14,7 @@ public class EnemyCore : MonoBehaviour
     EnemyMovement enemyMovement;
     EnemyKnockback enemyKnockback;
     EnemyHitFlash hitFlash;
+    EnemySquash enemySquash;
 
     private void Awake()
     {
@@ -22,6 +23,7 @@ public class EnemyCore : MonoBehaviour
         enemyKnockback = GetComponent<EnemyKnockback>();
         hitFlash = GetComponent<EnemyHitFlash>();
         enemyKnockback = GetComponent<EnemyKnockback>();
+        enemySquash = GetComponent<EnemySquash>();
     }
 
     private void OnEnable()
@@ -51,6 +53,9 @@ public class EnemyCore : MonoBehaviour
         if (hitFlash != null)
             hitFlash.Flash(defaultHitFeedback);
 
+        if(enemySquash != null)
+            enemySquash.TriggerSquash(info.hitDirection);
+        
         // 3. Global feel efektleri (timestop + shake)
         if (GameFeelController.Instance != null && defaultHitFeedback != null)
             GameFeelController.Instance.TriggerHitFeedback(defaultHitFeedback);
