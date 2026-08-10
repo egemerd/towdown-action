@@ -49,7 +49,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
     /// force: yön vektörü (magnitude = attacker'ýn base distance'ý)
     /// duration parametresi ignore edilir — profile.duration kullanýlýr.
     /// </summary>
-    public void ApplyForce(Vector3 force, float duration)
+    public void ApplyForce(Vector3 force, EnemyKnockbackConfigSO config)
     {
         if (config == null) return;
 
@@ -59,7 +59,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         if (knockbackRoutine != null)
             StopCoroutine(knockbackRoutine);
 
-        knockbackRoutine = StartCoroutine(KnockbackRoutine(scaledForce));
+        knockbackRoutine = StartCoroutine(KnockbackRoutine(scaledForce, config));
 
         HitCount++;
         OnKnockbackApplied?.Invoke(scaledForce);
@@ -68,7 +68,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             OnThresholdReached?.Invoke();
     }
 
-    private IEnumerator KnockbackRoutine(Vector3 totalOffset)
+    private IEnumerator KnockbackRoutine(Vector3 totalOffset, EnemyKnockbackConfigSO config)
     {
         Vector3 startPosition = transform.position;
         Vector3 targetPosition = startPosition + totalOffset;

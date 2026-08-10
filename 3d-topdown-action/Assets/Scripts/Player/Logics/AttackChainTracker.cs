@@ -34,12 +34,12 @@ public class AttackChainTracker : MonoBehaviour
 
     private void OnEnable()
     {
-        playerAttack.OnHitLanded += HandleAttackCounter;
+        //playerAttack.OnHitLanded += HandleAttackCounter;
     }
 
     private void OnDisable()
     {
-        playerAttack.OnHitLanded -= HandleAttackCounter;
+        //playerAttack.OnHitLanded -= HandleAttackCounter;
     }
 
     private void Update()
@@ -74,7 +74,7 @@ public class AttackChainTracker : MonoBehaviour
         AttackCounter();
     }
 
-    void AttackCounter()
+    public void AttackCounter()
     {
         currentChainIndex++;
         chainIndexTimer = 0f;
@@ -97,5 +97,12 @@ public class AttackChainTracker : MonoBehaviour
     {
         if (multiplierProfile == null) return 1f;
         return multiplierProfile.GetKnockbackMultiplier(currentChainIndex);
+    }
+
+    public EnemyKnockbackConfigSO GetCurrentKnockbackConfig()
+    {
+        if (multiplierProfile == null) return null;    
+        return multiplierProfile.GetKnockbackConfig(currentChainIndex);
+        
     }
 }

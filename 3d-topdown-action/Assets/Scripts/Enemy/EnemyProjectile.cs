@@ -22,21 +22,21 @@ public class EnemyProjectile : MonoBehaviour
         transform.position += direction * speed * Time.deltaTime;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (((1 << other.gameObject.layer) & playerLayer) == 0) return;
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (((1 << other.gameObject.layer) & playerLayer) == 0) return;
 
-        if (other.TryGetComponent<IDamageable>(out var damageable))
-        {
-            HitInfo info = HitInfo.FromAttack(
-                source: transform.position - direction,
-                target: other.ClosestPoint(transform.position),
-                damage: damage,
-                knockback: 0f
-            );
-            damageable.TakeDamage(info);
-        }
+    //    if (other.TryGetComponent<IDamageable>(out var damageable))
+    //    {
+    //        HitInfo info = HitInfo.FromAttack(
+    //            source: transform.position - direction,
+    //            target: other.ClosestPoint(transform.position),
+    //            damage: damage,
+    //            knockback: 0f
+    //        );
+    //        damageable.TakeDamage(info);
+    //    }
 
-        Destroy(gameObject);
-    }
+    //    Destroy(gameObject);
+    //}
 }

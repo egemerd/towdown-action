@@ -2,12 +2,13 @@ using UnityEngine;
 public struct HitInfo
 {
     public float damage;
+    public EnemyKnockbackConfigSO knockbackConfig;
     public Vector3 sourcePosition;
     public Vector3 hitPosition;
     public Vector3 hitDirection;
     public float knockbackForce;
 
-    public static HitInfo FromAttack(Vector3 source, Vector3 target, float damage, float knockback)
+    public static HitInfo FromAttack(Vector3 source, Vector3 target, float damage, float knockback, EnemyKnockbackConfigSO knockbackConfig)
     {
         Vector3 dir = target - source;
         dir.y = 0;
@@ -19,7 +20,8 @@ public struct HitInfo
             sourcePosition = source,
             hitPosition = target,
             hitDirection = dir,
-            knockbackForce = knockback
+            knockbackForce = knockback,
+            knockbackConfig = knockbackConfig
         };
     }
 }

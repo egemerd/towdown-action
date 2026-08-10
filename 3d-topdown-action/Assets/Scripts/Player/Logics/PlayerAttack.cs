@@ -190,9 +190,24 @@ public class PlayerAttack : MonoBehaviour
 
         Collider[] hits = Physics.OverlapSphere(attackCenter, data.radius, data.targetLayer);
 
-        float knockbackMultiplier = chainTracker != null
-        ? chainTracker.GetCurrentKnockbackMultiplier()
-        : 1f;
+        bool hitNewEnemy = false;
+        foreach (var col in hits)
+        {
+            if (col.TryGetComponent<IDamageable>(out var checkDamageable) && !alreadyHitThisAttack.Contains(checkDamageable))
+            {
+                hitNewEnemy = true;
+                break; // Bir tane yeni hedef bulmamız chain'i artırmak için yeterli
+            }
+        }
+
+        // 2. EĞER YENİ BİRİNE DEĞDİYSEK: HitInfo oluşturulmadan ÖNCE index'i artır!
+        if (hitNewEnemy && chainTracker != null)
+        {
+            chainTracker.AttackCounter();
+        }
+
+        // 3. ŞİMDİ EN GÜNCEL CONFIG'İ ÇEKİYORUZ (Index zaten bir üst satırda artmış oldu)
+        EnemyKnockbackConfigSO enemyKnockbackConfigSO = chainTracker != null ? chainTracker.GetCurrentKnockbackConfig() : null;
 
         foreach (var col in hits)
         {
@@ -207,7 +222,8 @@ public class PlayerAttack : MonoBehaviour
                 source: transform.position,
                 target: hitPos,
                 damage: data.damage,
-                knockback: data.knockbackForce * knockbackMultiplier
+                knockback: data.knockbackForce,
+                knockbackConfig: enemyKnockbackConfigSO
             );
 
             damageable.TakeDamage(info);
@@ -216,6 +232,8 @@ public class PlayerAttack : MonoBehaviour
             OnHitLanded?.Invoke(damageable, info);
         }
     }
+
+
 
     public bool TryCancelAttack()
     {

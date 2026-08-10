@@ -18,6 +18,9 @@ public class ChainMultiplierProfileSO : ScriptableObject
              "1.0 = normal, 2.0 = iki katı, vs. Son eleman finisher çarpanı olur.")]
     public float[] knockbackMultipliers = new float[] { 1f, 1f, 3f };
 
+    [Header("— Knockback Config (ileride) —")]
+    public EnemyKnockbackConfigSO[] knockbackConfigs;
+
     [Header("— Damage (ileride kullanılabilir) —")]
     [Tooltip("Chain step'e göre damage çarpanı. Şimdi kullanılmıyor, ileride eklenir.")]
     public float[] damageMultipliers = new float[] { 1f, 1f, 1.5f };
@@ -37,6 +40,14 @@ public class ChainMultiplierProfileSO : ScriptableObject
     public float GetKnockbackMultiplier(int chainIndex)
     {
         return GetMultiplierAt(knockbackMultipliers, chainIndex);
+    }
+
+    public EnemyKnockbackConfigSO GetKnockbackConfig(int chainIndex)
+    {
+        if (knockbackConfigs == null || knockbackConfigs.Length == 0) return null;
+        int arrayIndex = Mathf.Clamp(chainIndex - 1, 0, knockbackConfigs.Length - 1);
+        //Debug.Log($"GetKnockbackConfig: chainIndex={chainIndex}, arrayIndex={arrayIndex}, config={knockbackConfigs[arrayIndex]}");
+        return knockbackConfigs[arrayIndex];
     }
 
     public float GetDamageMultiplier(int chainIndex)
