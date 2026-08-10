@@ -6,6 +6,7 @@ public class AttackChainTracker : MonoBehaviour
     [Header("Config")]
     [Tooltip("Chain'in reset olmasý için gereken süre (son hit'ten itibaren).")]
     [SerializeField] private float chainResetTime = 2f;
+    [SerializeField] private ChainMultiplierProfileSO multiplierProfile;
 
     [Tooltip("Chain'in ulaþabileceði maksimum deðer. Aþarsa sýfýrlanýr (chain tamamlandý).")]
     [SerializeField] private int maxChainIndex = 3;
@@ -90,5 +91,11 @@ public class AttackChainTracker : MonoBehaviour
     public void ForceReset()
     {
         ResetChain();
+    }
+
+    public float GetCurrentKnockbackMultiplier()
+    {
+        if (multiplierProfile == null) return 1f;
+        return multiplierProfile.GetKnockbackMultiplier(currentChainIndex);
     }
 }

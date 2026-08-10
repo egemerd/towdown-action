@@ -26,11 +26,13 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private MonoBehaviour aimSourceComponent;   // MonoBehaviour ki inspector'da atansın
     private IAimSource aimSource;
 
+    
+
     // Cached references
     private PlayerInput playerInput;
     private InputAction attackAction;
     private PlayerMovement playerMovement;
-
+    private AttackChainTracker chainTracker;
     // State
     public AttackState CurrentState { get; private set; } = AttackState.Idle;
     private Coroutine attackRoutine;
@@ -61,7 +63,7 @@ public class PlayerAttack : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         playerMovement = GetComponent<PlayerMovement>();
-
+        chainTracker = GetComponent<AttackChainTracker>();
         aimSource = aimSourceComponent as IAimSource;
         if (aimSource == null && aimSourceComponent != null)
             Debug.LogError($"{aimSourceComponent.GetType().Name} IAimSource implement etmiyor!", this);
@@ -188,6 +190,10 @@ public class PlayerAttack : MonoBehaviour
 
         Collider[] hits = Physics.OverlapSphere(attackCenter, data.radius, data.targetLayer);
 
+        float knockbackMultiplier = chainTracker != null
+        ? chainTracker.GetCurrentKnockbackMultiplier()
+        : 1f;
+
         foreach (var col in hits)
         {
             if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
@@ -196,11 +202,12 @@ public class PlayerAttack : MonoBehaviour
 
             // Bu hit için özel HitInfo yarat — direction ve position her enemy için farklı
             Vector3 hitPos = col.ClosestPoint(transform.position);
+
             HitInfo info = HitInfo.FromAttack(
                 source: transform.position,
                 target: hitPos,
                 damage: data.damage,
-                knockback: data.knockbackForce
+                knockback: data.knockbackForce * knockbackMultiplier
             );
 
             damageable.TakeDamage(info);

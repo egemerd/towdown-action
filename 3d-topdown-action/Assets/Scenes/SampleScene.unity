@@ -7288,6 +7288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackChainTracker
   chainResetTime: 2
+  multiplierProfile: {fileID: 11400000, guid: 5ff9ed68acfd6024eac6cbf5008e58e1, type: 2}
   maxChainIndex: 3
   currentChainIndex: 0
   chainIndexTimer: 0
@@ -8232,7 +8233,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1e0afc7836f2454b8c3c2d9c0763985, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFeelController
-  cameraShaker: {fileID: 0}
 --- !u!4 &1980280200
 Transform:
   m_ObjectHideFlags: 0
