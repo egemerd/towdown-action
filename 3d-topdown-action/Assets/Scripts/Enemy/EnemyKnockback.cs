@@ -3,32 +3,34 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Enemy'ye profile-based knockback uygular.
-/// Her enemy kendi EnemyKnockbackProfileSO'sunu taþýr — light/heavy/boss enemy
-/// farklý karakterde savrulur, ama sistemi ayný.
-///
-/// HitInfo.knockbackForce = attacker'ýn verdiði base distance,
-/// profile.distanceMultiplier ile ölçeklenir.
+/// Impulse + Drag tabanlý knockback.
+/// ApplyForce() anlýk velocity impulse'u uygular; her frame velocity 
+/// exponential decay ile söner. Curve yok — pure physics-inspired tuning.
+/// 
+/// CurrentVelocity public — VFX trail veya diðer sistemler bunu okuyup 
+/// intensity scale edebilir (knockback trail'i hýza göre uzasýn gibi).
 /// </summary>
 public class EnemyKnockback : MonoBehaviour, IKnockable
 {
     [Header("Config")]
-    [Tooltip("Bu enemy'nin knockback karakterini belirleyen profile. " +
-             "Farklý enemy türleri farklý profile referans eder.")]
     [SerializeField] private EnemyKnockbackConfigSO config;
 
     [Header("Wall Detection")]
     [SerializeField] private LayerMask wallLayer;
+    [Tooltip("SphereCast radius — enemy collider'ýndan biraz küçük tut ki sýkýþma olmasýn.")]
+    [SerializeField] private float wallCastRadius = 0.5f;
 
     [Header("Combo (bilardo hazýrlýðý)")]
-    [Tooltip("Kaç hit sonrasý threshold event fýrlar.")]
     [SerializeField] private int knockbackThreshold = 3;
 
     // Runtime state
     private Coroutine knockbackRoutine;
+    private Vector3 currentVelocity;
 
     // Public state
     public bool IsKnockedBack => knockbackRoutine != null;
+    public Vector3 CurrentVelocity => currentVelocity;  // VFX/Trail sistemleri için
+    public float CurrentSpeed => currentVelocity.magnitude;
     public int HitCount { get; private set; }
     public EnemyKnockbackConfigSO Config => config;
 
@@ -46,74 +48,94 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
 
     /// <summary>
     /// IKnockable implementation.
-    /// force: yön vektörü (magnitude = attacker'ýn base distance'ý)
-    /// duration parametresi ignore edilir — profile.duration kullanýlýr.
+    /// force.magnitude = INITIAL SPEED (units/sec), NOT distance.
+    /// force direction = knockback yönü.
+    /// configOverride null ise inspector'daki default config kullanýlýr.
     /// </summary>
-    public void ApplyForce(Vector3 force, EnemyKnockbackConfigSO config)
+    public void ApplyForce(Vector3 force, EnemyKnockbackConfigSO configOverride)
     {
-        if (config == null) return;
+        var activeConfig = configOverride != null ? configOverride : config;
+        if (activeConfig == null) return;
 
-        // Attacker'ýn verdiði force'u config ile ölçekle
-        Vector3 scaledForce = force * config.distanceMultiplier;
+        // Direction + speed'i ayrýþtýr, speed'i profile ile scale et
+        Vector3 direction = force.sqrMagnitude > 0.0001f
+            ? force.normalized
+            : transform.forward;
+        float initialSpeed = force.magnitude * activeConfig.speedMultiplier;
 
+        // Anlýk velocity impulse
+        currentVelocity = direction * initialSpeed;
+
+        // Ongoing knockback varsa iptal et — yeni hit tazeleyecek
         if (knockbackRoutine != null)
             StopCoroutine(knockbackRoutine);
 
-        knockbackRoutine = StartCoroutine(KnockbackRoutine(scaledForce, config));
+        knockbackRoutine = StartCoroutine(KnockbackRoutine(activeConfig));
 
         HitCount++;
-        OnKnockbackApplied?.Invoke(scaledForce);
+        OnKnockbackApplied?.Invoke(currentVelocity);
 
         if (HitCount >= knockbackThreshold)
             OnThresholdReached?.Invoke();
     }
 
-    private IEnumerator KnockbackRoutine(Vector3 totalOffset, EnemyKnockbackConfigSO config)
+    private IEnumerator KnockbackRoutine(EnemyKnockbackConfigSO activeConfig)
     {
-        Vector3 startPosition = transform.position;
-        Vector3 targetPosition = startPosition + totalOffset;
+        float totalElapsed = 0f;
+        float burstElapsed = 0f;
+        Vector3 previousPosition = transform.position;
+        float minSpeedSqr = activeConfig.minSpeed * activeConfig.minSpeed;
 
-        // Overshoot destekliyorsa hedefi biraz öteye taþý — curve %100'ü geçerse target'ý aþar
-        Vector3 overshootTarget = targetPosition;
-        if (config.overshootAmount > 0f)
-            overshootTarget = startPosition + totalOffset * (1f + config.overshootAmount);
-
-        float elapsed = 0f;
-        float duration = config.duration;
-        Vector3 previousPosition = startPosition;
-
-        while (elapsed < duration)
+        while (true)
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            float curveT = config.movementCurve.Evaluate(t);
+            float dt = Time.deltaTime;
+            totalElapsed += dt;
 
-            // Overshoot varsa curve'ün 1'i geçtiði bölümde overshootTarget'a lerp
-            Vector3 currentTarget = config.overshootAmount > 0f && curveT > 1f
-                ? overshootTarget
-                : targetPosition;
+            // Safety cap
+            if (totalElapsed >= activeConfig.maxDuration) break;
 
-            Vector3 newPosition = Vector3.LerpUnclamped(startPosition, currentTarget, curveT);
+            // Burst phase'de drag azaltýlýr — punchy kick hissi
+            float effectiveDrag;
+            if (burstElapsed < activeConfig.burstDuration)
+            {
+                effectiveDrag = activeConfig.drag * activeConfig.burstDragMultiplier;
+                burstElapsed += dt;
+            }
+            else
+            {
+                effectiveDrag = activeConfig.drag;
+            }
 
-            // Wall check
-            Vector3 moveDelta = newPosition - previousPosition;
-            if (CheckWallHit(previousPosition, moveDelta, out Vector3 hitPoint))
+            // Framerate-independent exponential decay: v(t+dt) = v(t) * exp(-drag * dt)
+            // Bu senin klasik `1 - Exp(-speed * dt)` pattern'inin türev'i —
+            // burada target=0 olduðu için doðrudan çarpým yeterli.
+            float decayFactor = Mathf.Exp(-effectiveDrag * dt);
+            currentVelocity *= decayFactor;
+
+            // Position update
+            Vector3 delta = currentVelocity * dt;
+
+            // Wall check — hareket ETMEDEN önce doðrula
+            if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint))
             {
                 transform.position = hitPoint;
+                currentVelocity = Vector3.zero;
                 OnWallHit?.Invoke(hitPoint);
                 break;
             }
 
+            Vector3 newPosition = previousPosition + delta;
             transform.position = newPosition;
             previousPosition = newPosition;
+
+            // End condition: hýz çok düþükse dur.
+            // sqrMagnitude karþýlaþtýrma — sqrt hesaplamasýndan kaçýnýr (mikro-opt ama free)
+            if (currentVelocity.sqrMagnitude < minSpeedSqr) break;
 
             yield return null;
         }
 
-        // Final position — duvar yoksa hedefe otur
-        if (elapsed >= duration)
-            transform.position = targetPosition;
-
+        currentVelocity = Vector3.zero;
         knockbackRoutine = null;
         OnKnockbackEnded?.Invoke();
     }
@@ -126,20 +148,16 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         float castDistance = delta.magnitude;
         Vector3 castDirection = delta.normalized;
 
-        if (Physics.SphereCast(fromPosition, 0.5f, castDirection,
+        if (Physics.SphereCast(fromPosition, wallCastRadius, castDirection,
             out RaycastHit hit, castDistance, wallLayer))
         {
             hitPoint = hit.point;
             return true;
         }
-
         return false;
     }
 
-    public void ResetHitCount()
-    {
-        HitCount = 0;
-    }
+    public void ResetHitCount() => HitCount = 0;
 
     public void StopKnockback()
     {
@@ -147,6 +165,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         {
             StopCoroutine(knockbackRoutine);
             knockbackRoutine = null;
+            currentVelocity = Vector3.zero;
             OnKnockbackEnded?.Invoke();
         }
     }

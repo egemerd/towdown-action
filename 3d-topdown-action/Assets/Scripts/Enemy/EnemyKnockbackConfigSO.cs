@@ -1,47 +1,51 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// Bir enemy türünün knockback karakterini tanımlar.
-/// Her enemy prefab kendi profile'ını referans eder — light enemy hızlı ve uzağa savrulur,
-/// heavy enemy yavaş ve kısa. Profile asset'leri arasında hızlıca swap edilebilir.
+/// Impulse + Drag tabanlÄ± knockback profile.
+/// Enemy'ye baÅŸlangÄ±Ã§ velocity'si verilir, sonra exponential decay ile sÃ¶ner.
+/// Curve-based sistemin aksine "distance"Ä± direkt kontrol etmezsin â€” 
+/// initial speed + drag birlikte total mesafeyi belirler.
+/// 
+/// Rough hesaplama: totalDistance â‰ˆ initialSpeed / drag
+/// (minSpeed threshold nedeniyle bir miktar daha az)
 /// </summary>
 [CreateAssetMenu(fileName = "KnockbackProfile", menuName = "Combat/Knockback Profile", order = 5)]
 public class EnemyKnockbackConfigSO : ScriptableObject
 {
-    [Header("— Distance —")]
-    [Tooltip("Attacker'dan gelen knockbackForce'un çarpanı. " +
-             "1 = attacker'ın verdiği mesafe aynen, 2 = iki katı, 0.5 = yarısı. " +
-             "Light enemy 1.5x, heavy enemy 0.3-0.5x tipik.")]
-    public float distanceMultiplier = 1f;
+    [Header("â€” Speed â€”")]
+    [Tooltip("Attacker'Ä±n verdiÄŸi knockbackForce (initial speed) Ã§arpanÄ±. " +
+             "Light enemy 1.5x (daha hÄ±zlÄ± ve uzaÄŸa savrulur), " +
+             "heavy enemy 0.3-0.5x (kÄ±sa mesafede durur).")]
+    public float speedMultiplier = 1f;
 
-    [Header("— Timing —")]
-    [Tooltip("Knockback süresi (saniye). Uzun süre = daha uzun glide hissi. " +
-             "Akışkan glide için 0.4-0.6s önerilir.")]
-    [Range(0.1f, 1.5f)]
-    public float duration = 0.5f;
+    [Header("â€” Drag / Damping â€”")]
+    [Tooltip("SÃ¼rtÃ¼nme katsayÄ±sÄ±. YÃ¼ksek = hÄ±zlÄ± durur (snappy). DÃ¼ÅŸÃ¼k = uzun kayar (icy glide). " +
+             "Tipik deÄŸerler: 3 (uzun glide), 6 (dengeli), 12 (hÄ±zlÄ± durur).")]
+    [Range(0.5f, 20f)]
+    public float drag = 6f;
 
-    [Header("— Curve —")]
-    [Tooltip("Hareket eğrisi. Ease-out (dik başla, yatay bit) glide hissi verir. " +
-             "Ease-in-out daha 'ağır' bir his verir.")]
-    public AnimationCurve movementCurve = CreateDefaultGlideCurve();
+    [Tooltip("Bu hÄ±zÄ±n (units/sec) altÄ±na dÃ¼ÅŸÃ¼nce knockback zorla biter. " +
+             "Yoksa exponential decay sonsuza kadar mikroskobik hÄ±zla sÃ¼rÃ¼nÃ¼r. " +
+             "0.2-0.5 arasÄ± iyi baÅŸlangÄ±Ã§.")]
+    [Range(0.05f, 2f)]
+    public float minSpeed = 0.3f;
 
-    [Header("— Overshoot (opsiyonel) —")]
-    [Tooltip("Enemy hedefi hafifçe geçip geri gelir mi? Cartoon overshoot için. " +
-             "0 = yok, 0.1-0.2 = hafif geçme.")]
+    [Header("â€” Burst (optional punch phase) â€”")]
+    [Tooltip("Ä°lk N saniye 'kick' hissi iÃ§in drag azaltÄ±lÄ±r. " +
+             "0 = burst yok (saf exponential decay). " +
+             "0.05-0.15 arasÄ± punchy arcade hissi.")]
     [Range(0f, 0.3f)]
-    public float overshootAmount = 0f;
+    public float burstDuration = 0.08f;
 
-    /// <summary>
-    /// Cubic ease-out benzeri, akışkan glide veren default curve.
-    /// Başta hızlı, sonda yumuşakça durur — buz üstünde kayan taş hissi.
-    /// </summary>
-    private static AnimationCurve CreateDefaultGlideCurve()
-    {
-        var curve = new AnimationCurve(
-            new Keyframe(0f, 0f, 0f, 4f),      // Başlangıç: yatay giriş, dik çıkış (ivmelenme)
-            new Keyframe(0.3f, 0.75f, 1f, 1f), // Orta: hızlı ilerleme
-            new Keyframe(1f, 1f, 0f, 0f)       // Bitiş: yatay giriş ve çıkış (durak glide)
-        );
-        return curve;
-    }
+    [Tooltip("Burst sÃ¼resince drag bu deÄŸerle Ã§arpÄ±lÄ±r. " +
+             "0 = burst boyunca hiÃ§ drag yok (max punch). " +
+             "0.3 = drag'in %30'u (yumuÅŸak punch). " +
+             "1 = burst effect yok.")]
+    [Range(0f, 1f)]
+    public float burstDragMultiplier = 0.2f;
+
+    [Header("â€” Safety â€”")]
+    [Tooltip("Knockback bu sÃ¼rede zorla sonlanÄ±r â€” extreme low drag veya bug ihtimaline karÅŸÄ± guard.")]
+    [Range(0.5f, 5f)]
+    public float maxDuration = 2f;
 }
