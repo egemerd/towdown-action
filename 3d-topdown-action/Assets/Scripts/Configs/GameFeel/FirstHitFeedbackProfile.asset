@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05419175136c18f4f9bf8a1f24f92fa5, type: 3}
   m_Name: FirstHitFeedbackProfile
   m_EditorClassIdentifier: Assembly-CSharp::HitFeedbackProfileSO
-  timeStopScale: 0.05
-  timeStopDuration: 0.124
+  timeStopScale: 0.06
+  timeStopDuration: 0.08
   shakeMagnitude: 0.3
   shakeDuration: 0.15
   flashColor: {r: 1, g: 1, b: 1, a: 1}

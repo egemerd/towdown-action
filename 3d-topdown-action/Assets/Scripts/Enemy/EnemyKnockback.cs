@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public class EnemyKnockback : MonoBehaviour, IKnockable
 {
-    [Header("Profile")]
+    [Header("Config")]
     [Tooltip("Bu enemy'nin knockback karakterini belirleyen profile. " +
              "Farklý enemy türleri farklý profile referans eder.")]
     [SerializeField] private EnemyKnockbackConfigSO config;

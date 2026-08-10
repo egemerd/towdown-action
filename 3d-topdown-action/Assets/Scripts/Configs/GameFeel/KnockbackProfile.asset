@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a2dfff66d8ec5b45971f1fa567e580f, type: 3}
   m_Name: KnockbackProfile
   m_EditorClassIdentifier: Assembly-CSharp::EnemyKnockbackConfigSO
-  distanceMultiplier: 1
-  duration: 0.5
+  distanceMultiplier: 0.08
+  duration: 0.2
   movementCurve:
     serializedVersion: 2
     m_Curve:
@@ -21,16 +21,7 @@ MonoBehaviour:
       time: 0
       value: 0
       inSlope: 0
-      outSlope: 4
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.3
-      value: 0.75
-      inSlope: 1
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
