@@ -15,9 +15,6 @@ public class GameFeelController : MonoBehaviour
 {
     public static GameFeelController Instance { get; private set; }
 
-    [Header("References")]
-    [SerializeField] private CameraShaker cameraShaker;
-
     // Aktif time stop coroutine — üst üste binmesin
     private Coroutine timeStopRoutine;
 
@@ -29,9 +26,7 @@ public class GameFeelController : MonoBehaviour
             return;
         }
         Instance = this;
-
-        if (cameraShaker == null)
-            cameraShaker = FindObjectOfType<CameraShaker>();
+       
     }
 
     private void OnDestroy()
@@ -50,10 +45,6 @@ public class GameFeelController : MonoBehaviour
         // Time stop
         if (profile.timeStopDuration > 0f)
             TriggerTimeStop(profile.timeStopScale, profile.timeStopDuration);
-
-        // Screen shake
-        //if (profile.shakeMagnitude > 0f && cameraShaker != null)
-            //cameraShaker.Shake(profile.shakeMagnitude, profile.shakeDuration);
     }
 
     /// <summary>
