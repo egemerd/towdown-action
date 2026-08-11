@@ -1,26 +1,27 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Impulse + Drag tabanlý knockback.
-/// ApplyForce() anlýk velocity impulse'u uygular; her frame velocity 
-/// exponential decay ile söner. Curve yok — pure physics-inspired tuning.
+/// Impulse + Drag tabanlÄ± knockback.
+/// ApplyForce() anlÄ±k velocity impulse'u uygular; her frame velocity 
+/// exponential decay ile sÃ¶ner. Curve yok â€” pure physics-inspired tuning.
 /// 
-/// CurrentVelocity public — VFX trail veya diðer sistemler bunu okuyup 
-/// intensity scale edebilir (knockback trail'i hýza göre uzasýn gibi).
+/// CurrentVelocity public â€” VFX trail veya diÄŸer sistemler bunu okuyup 
+/// intensity scale edebilir (knockback trail'i hÄ±za gÃ¶re uzasÄ±n gibi).
 /// </summary>
 public class EnemyKnockback : MonoBehaviour, IKnockable
 {
     [Header("Config")]
     [SerializeField] private EnemyKnockbackConfigSO config;
+    [SerializeField] private EnemyKnockbackConfigSO resumeKnockbackConfig;
 
     [Header("Wall Detection")]
     [SerializeField] private LayerMask wallLayer;
-    [Tooltip("SphereCast radius — enemy collider'ýndan biraz küçük tut ki sýkýþma olmasýn.")]
+    [Tooltip("SphereCast radius â€” enemy collider'Ä±ndan biraz kÃ¼Ã§Ã¼k tut ki sÄ±kÄ±ÅŸma olmasÄ±n.")]
     [SerializeField] private float wallCastRadius = 0.5f;
 
-    [Header("Combo (bilardo hazýrlýðý)")]
+    [Header("Combo (bilardo hazÄ±rlÄ±ÄŸÄ±)")]
     [SerializeField] private int knockbackThreshold = 3;
 
     // Runtime state
@@ -29,44 +30,52 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
 
     // Public state
     public bool IsKnockedBack => knockbackRoutine != null;
-    public Vector3 CurrentVelocity => currentVelocity;  // VFX/Trail sistemleri için
+    public Vector3 CurrentVelocity => currentVelocity;  // VFX/Trail sistemleri iÃ§in
     public float CurrentSpeed => currentVelocity.magnitude;
     public int HitCount { get; private set; }
     public EnemyKnockbackConfigSO Config => config;
+    private bool pendingResume;
+
+    // Yeni public method
+    public void MarkForResume()
+    {
+        pendingResume = true;
+    }
+
 
     // Events
     public event Action<Vector3> OnKnockbackApplied;
     public event Action OnKnockbackEnded;
     public event Action OnThresholdReached;
-    public event Action<Vector3> OnWallHit;
+    public event Action<Vector3,Vector3> OnWallHit;
 
     private void Awake()
     {
         if (config == null)
-            Debug.LogError($"EnemyKnockback: Config atanmamýþ! {gameObject.name}", this);
+            Debug.LogError($"EnemyKnockback: Config atanmamÄ±ÅŸ! {gameObject.name}", this);
     }
 
     /// <summary>
     /// IKnockable implementation.
     /// force.magnitude = INITIAL SPEED (units/sec), NOT distance.
-    /// force direction = knockback yönü.
-    /// configOverride null ise inspector'daki default config kullanýlýr.
+    /// force direction = knockback yÃ¶nÃ¼.
+    /// configOverride null ise inspector'daki default config kullanÄ±lÄ±r.
     /// </summary>
     public void ApplyForce(Vector3 force, EnemyKnockbackConfigSO configOverride)
     {
         var activeConfig = configOverride != null ? configOverride : config;
         if (activeConfig == null) return;
 
-        // Direction + speed'i ayrýþtýr, speed'i profile ile scale et
+        // Direction + speed'i ayrÄ±ÅŸtÄ±r, speed'i profile ile scale et
         Vector3 direction = force.sqrMagnitude > 0.0001f
             ? force.normalized
             : transform.forward;
         float initialSpeed = force.magnitude * activeConfig.speedMultiplier;
 
-        // Anlýk velocity impulse
+        // AnlÄ±k velocity impulse
         currentVelocity = direction * initialSpeed;
 
-        // Ongoing knockback varsa iptal et — yeni hit tazeleyecek
+        // Ongoing knockback varsa iptal et â€” yeni hit tazeleyecek
         if (knockbackRoutine != null)
             StopCoroutine(knockbackRoutine);
 
@@ -94,7 +103,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             // Safety cap
             if (totalElapsed >= activeConfig.maxDuration) break;
 
-            // Burst phase'de drag azaltýlýr — punchy kick hissi
+            // Burst phase'de drag azaltÄ±lÄ±r â€” punchy kick hissi
             float effectiveDrag;
             if (burstElapsed < activeConfig.burstDuration)
             {
@@ -107,29 +116,46 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             }
 
             // Framerate-independent exponential decay: v(t+dt) = v(t) * exp(-drag * dt)
-            // Bu senin klasik `1 - Exp(-speed * dt)` pattern'inin türev'i —
-            // burada target=0 olduðu için doðrudan çarpým yeterli.
+            // Bu senin klasik `1 - Exp(-speed * dt)` pattern'inin tÃ¼rev'i â€”
+            // burada target=0 olduÄŸu iÃ§in doÄŸrudan Ã§arpÄ±m yeterli.
             float decayFactor = Mathf.Exp(-effectiveDrag * dt);
             currentVelocity *= decayFactor;
 
             // Position update
             Vector3 delta = currentVelocity * dt;
 
-            // Wall check — hareket ETMEDEN önce doðrula
-            if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint))
+            // Wall check â€” hareket ETMEDEN Ã¶nce doÄŸrula
+            if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint, out Vector3 hitNormal))
             {
-                transform.position = hitPoint;
-                currentVelocity = Vector3.zero;
-                OnWallHit?.Invoke(hitPoint);
-                break;
+                Debug.Log($"EnemyKnockback: Wall hit at {hitPoint} with normal {hitNormal}");
+                transform.position = hitPoint + hitNormal * 0.05f;
+
+                // NOT: velocity'i sÄ±fÄ±rlamÄ±yoruz henÃ¼z â€” Bounce component event iÃ§inde 
+                //      CurrentVelocity'yi okuyup direction hesaplayacak.
+                knockbackRoutine = null;
+                pendingResume = false; // temiz slate â€” dinleyicilerden birinin claim etmesini bekliyoruz
+
+                OnWallHit?.Invoke(hitPoint, hitNormal);
+
+                if (!pendingResume)
+                {
+                    // Kimse bounce claim etmedi â€” gerÃ§ekten bittik
+                    currentVelocity = Vector3.zero;
+                    OnKnockbackEnded?.Invoke();
+                }
+                // else: Bounce component MarkForResume() Ã§aÄŸÄ±rdÄ±, ResumeKnockback pause sonrasÄ± 
+                //       Ã§aÄŸrÄ±lacak. Åžimdilik enemy duruyor (velocity aynÄ± ama coroutine yok) â€” 
+                //       impact pause'un yarattÄ±ÄŸÄ± doÄŸal freeze.
+
+                yield break;
             }
 
             Vector3 newPosition = previousPosition + delta;
             transform.position = newPosition;
             previousPosition = newPosition;
 
-            // End condition: hýz çok düþükse dur.
-            // sqrMagnitude karþýlaþtýrma — sqrt hesaplamasýndan kaçýnýr (mikro-opt ama free)
+            // End condition: hÄ±z Ã§ok dÃ¼ÅŸÃ¼kse dur.
+            // sqrMagnitude karÅŸÄ±laÅŸtÄ±rma â€” sqrt hesaplamasÄ±ndan kaÃ§Ä±nÄ±r (mikro-opt ama free)
             if (currentVelocity.sqrMagnitude < minSpeedSqr) break;
 
             yield return null;
@@ -140,9 +166,27 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         OnKnockbackEnded?.Invoke();
     }
 
-    private bool CheckWallHit(Vector3 fromPosition, Vector3 delta, out Vector3 hitPoint)
+    public void ResumeKnockback(Vector3 velocity, EnemyKnockbackConfigSO configOverride = null)
+    {
+        // Priority: parametre > resumeKnockbackConfig field > default config
+        var activeConfig = configOverride != null
+            ? configOverride
+            : (resumeKnockbackConfig != null ? resumeKnockbackConfig : config);
+
+        if (activeConfig == null) return;
+
+        if (knockbackRoutine != null) StopCoroutine(knockbackRoutine);
+
+        currentVelocity = velocity;
+        pendingResume = false;  // claim tamamlandÄ±, flag temizle
+        knockbackRoutine = StartCoroutine(KnockbackRoutine(activeConfig));
+    }
+
+    private bool CheckWallHit(Vector3 fromPosition, Vector3 delta,
+                          out Vector3 hitPoint, out Vector3 hitNormal)
     {
         hitPoint = default;
+        hitNormal = default;
         if (wallLayer == 0 || delta.sqrMagnitude < 0.0001f) return false;
 
         float castDistance = delta.magnitude;
@@ -152,6 +196,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             out RaycastHit hit, castDistance, wallLayer))
         {
             hitPoint = hit.point;
+            hitNormal = hit.normal;   
             return true;
         }
         return false;

@@ -46,7 +46,7 @@ public class EnemyCore : MonoBehaviour
             Vector3 force = info.hitDirection * info.knockbackForce;
             force.y = 0f; // top-down: sadece XZ
             enemyKnockback.ApplyForce(force, info.knockbackConfig);
-            Debug.Log($"Applied knockback with force {force} and config {info.knockbackConfig}");
+            //Debug.Log($"Applied knockback with force {force} and config {info.knockbackConfig}");
         }
 
         // 2. Hit flash tetikle

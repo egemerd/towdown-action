@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4162088624817492342}
   - component: {fileID: 5628615305216819347}
   - component: {fileID: 5889650754104817743}
+  - component: {fileID: 1414836192622584726}
   m_Layer: 14
   m_Name: EnemyProjectileAttack
   m_TagString: Untagged
@@ -130,9 +131,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyKnockback
   config: {fileID: 11400000, guid: aa1e593557917924aa8c0959b5b3cf26, type: 2}
+  resumeKnockbackConfig: {fileID: 11400000, guid: c7879fc8bb71dfa45bf2af6c9dbb76a2, type: 2}
   wallLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   wallCastRadius: 0.5
   knockbackThreshold: 3
 --- !u!114 &4162088624817492342
@@ -176,6 +178,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyLook
   target: {fileID: 0}
+--- !u!114 &1414836192622584726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5691328435424053603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21ec9d56ccd4a584dbfcef3643620fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBounce
+  config: {fileID: 11400000, guid: 499f24b0192b87042b17968a9291bdd6, type: 2}
 --- !u!1 &5805654874269133642
 GameObject:
   m_ObjectHideFlags: 0

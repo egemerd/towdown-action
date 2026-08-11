@@ -24,6 +24,6 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             OnDied?.Invoke();
         }
 
-        Debug.Log($"{info.knockbackConfig}");
+        //Debug.Log($"{info.knockbackConfig}");
     }
 }
