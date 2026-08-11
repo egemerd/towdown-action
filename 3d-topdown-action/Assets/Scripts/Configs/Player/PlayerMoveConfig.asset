@@ -16,7 +16,7 @@ MonoBehaviour:
   accelerationTime: 0.04
   decelerationTime: 0.22
   turnSpeed: 18
-  maxLeanAngle: 14.47
+  maxLeanAngle: 0
   leanSmoothing: 12
   attackVelocityDecrease: 0.7
   gravity: -20

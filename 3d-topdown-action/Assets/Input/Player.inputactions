@@ -32,6 +32,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Dash",
+                    "type": "Button",
+                    "id": "2290c79a-a08a-4e6d-97bb-4304f5ff3739",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -147,17 +156,6 @@
                 },
                 {
                     "name": "",
-                    "id": "4c6af42f-d803-4713-8844-d453d2b83c32",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "62f33cd7-261f-481b-95c5-c1934a68a1b2",
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
@@ -186,6 +184,17 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "BasicAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "692e08dd-b291-4a95-9ae7-ed03abb9f279",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

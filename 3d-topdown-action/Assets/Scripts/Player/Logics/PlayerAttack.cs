@@ -56,7 +56,9 @@ public class PlayerAttack : MonoBehaviour
 
     // Public queryable state — Movement, Dash bakar
     public bool IsAttacking => CurrentState != AttackState.Idle;
-    public bool CanCancel => CurrentState == AttackState.Recovery && canCancelRecovery;
+    public bool CanCancel =>
+    CurrentState == AttackState.Windup ||
+    (CurrentState == AttackState.Recovery && canCancelRecovery);
 
 
     private void Awake()
@@ -247,6 +249,7 @@ public class PlayerAttack : MonoBehaviour
 
         CurrentState = AttackState.Idle;
         canCancelRecovery = false;
+        alreadyHitThisAttack.Clear();  // ← YENİ
         if (attackVisual != null) attackVisual.SetActive(false);
 
         OnAttackCancelled?.Invoke();

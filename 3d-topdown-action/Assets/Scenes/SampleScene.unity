@@ -6832,7 +6832,7 @@ GameObject:
   - component: {fileID: 1030943701}
   - component: {fileID: 1030943700}
   m_Layer: 11
-  m_Name: Capsule
+  m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7157,6 +7157,8 @@ GameObject:
   - component: {fileID: 1353268260}
   - component: {fileID: 1353268263}
   - component: {fileID: 1353268262}
+  - component: {fileID: 1353268265}
+  - component: {fileID: 1353268264}
   m_Layer: 11
   m_Name: Player
   m_TagString: Untagged
@@ -7439,6 +7441,36 @@ MonoBehaviour:
   cameraShaker: {fileID: 330585548}
   hitShakeProfile: {fileID: 11400000, guid: 272b7455eeab8734eb9a0f1648fdedff, type: 2}
   alternateDirection: 1
+--- !u!114 &1353268264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353268248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a997c9e60158ae4cad11ad77d21ca1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSquash
+  squashRoot: {fileID: 1030943699}
+--- !u!114 &1353268265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353268248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6424afa28b8ad7b4a8d5ff99b14a598b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDash
+  config: {fileID: 11400000, guid: 92ecb78eb0231544abac35e26ccbf54a, type: 2}
+  directionSource: 0
+  dashBuffer:
+    bufferDuration: 0.15
+  aimSourceComponent: {fileID: 1353268259}
 --- !u!1 &1485221856
 GameObject:
   m_ObjectHideFlags: 0

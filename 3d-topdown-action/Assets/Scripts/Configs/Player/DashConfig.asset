@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bff77c37c3911f40a2c83e8972b4945, type: 3}
+  m_Name: DashConfig
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDashConfigSO
+  distance: 5
+  duration: 0.22
+  maxSpeed: 32
+  easePower: 2.5
+  iframeDuration: 0.16
+  cooldown: 0.2
+  endSpeed: 6
+  trailPrefab: {fileID: 0}
+  trailLifetime: 0.8
+  trailSpawnOffset: {x: 0, y: 0, z: 0}
+  squashProfile: {fileID: 11400000, guid: f2f21dd9bb2fa70408dbe37497fde036, type: 2}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  wallCastRadius: 0.4

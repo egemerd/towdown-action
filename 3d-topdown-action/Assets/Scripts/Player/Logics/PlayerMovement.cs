@@ -125,6 +125,15 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(delta);
     }
 
+    public void SetVelocity(Vector3 velocity)
+    {
+        // 'currentVelocity' senin internal field'ının adı ne ise onu set et.
+        // Muhtemelen şu an private bir field, `SerializeField` veya direkt public API 
+        // ile set edilebilir hale getir.
+        currentVelocity = velocity;
+        currentVelocity.y = 0f;
+    }
+
     private void UpdateFacingAndLean()
     {
         Vector3 horiz = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
