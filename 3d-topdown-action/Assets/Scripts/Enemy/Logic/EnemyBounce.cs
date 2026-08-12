@@ -46,6 +46,8 @@ public class EnemyBounce : MonoBehaviour
         bounceCount = 0;
     }
 
+    
+
     private void HandleWallHit(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (config == null) return;
@@ -64,6 +66,7 @@ public class EnemyBounce : MonoBehaviour
             OnBounceLimitReached?.Invoke();
             return;
         }
+
 
         // === Bu noktadan sonra bounce olacak — CLAIM ET ===
         // Knockback'e "ben devralıyorum, OnKnockbackEnded fire etme" sinyali ver.
@@ -93,6 +96,8 @@ public class EnemyBounce : MonoBehaviour
         if (bounceRoutine != null) StopCoroutine(bounceRoutine);
         bounceRoutine = StartCoroutine(BounceWithPause(finalVelocity, hitPoint, hitNormal));
     }
+
+    
 
     private IEnumerator BounceWithPause(Vector3 finalVelocity, Vector3 hitPoint, Vector3 hitNormal)
     {

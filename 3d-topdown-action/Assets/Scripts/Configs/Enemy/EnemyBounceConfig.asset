@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56dbc3b764bb9764789a396d1780478b, type: 3}
   m_Name: EnemyBounceConfig
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBounceConfigSO
-  bounceSpeed: 25.5
+  bounceSpeed: 20.6
   energyRetention: 1
   angleBlend: 0.9
   maxBounces: 3
   minVelocityToBounce: 1.5
-  impactPauseDuration: 0.06
+  impactPauseDuration: 0.03

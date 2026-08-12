@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5163c4b6dffd75e46affab01f90a74e8, type: 3}
+  m_Name: WallBounceEffectConfig
+  m_EditorClassIdentifier: Assembly-CSharp::WallBounceEffectConfigSO
+  bounceForce: {x: 0.2, y: 0.2, z: 0.3}
+  bounceDuration: 0.4
+  randomness: 138
+  bounceVibrato: 2
+  fadeOut: 1
+  positionForce: {x: 0.05, y: 0.06, z: 0.03}
+  positionDuration: 0.4
+  positionRandomness: 104
+  positionVibrato: 3
+  positionFadeOut: 1

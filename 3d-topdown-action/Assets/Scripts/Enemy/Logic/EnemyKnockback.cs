@@ -130,6 +130,8 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
                 Debug.Log($"EnemyKnockback: Wall hit at {hitPoint} with normal {hitNormal}");
                 //transform.position = hitPoint + hitNormal * 0.05f;
 
+                var bounceEffect = GetComponent<WallBounceEffect>();
+
                 // NOT: velocity'i sıfırlamıyoruz henüz — Bounce component event içinde 
                 //      CurrentVelocity'yi okuyup direction hesaplayacak.
                 knockbackRoutine = null;
@@ -192,9 +194,11 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         float castDistance = delta.magnitude;
         Vector3 castDirection = delta.normalized;
 
+
         if (Physics.SphereCast(fromPosition, wallCastRadius, castDirection,
             out RaycastHit hit, castDistance, wallLayer))
         {
+            hit.collider.gameObject.GetComponent<WallBounceEffect>().BounceEffect();
             hitPoint = hit.point;
             hitNormal = hit.normal;   
             return true;
@@ -213,5 +217,11 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             currentVelocity = Vector3.zero;
             OnKnockbackEnded?.Invoke();
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position, wallCastRadius);
     }
 }
