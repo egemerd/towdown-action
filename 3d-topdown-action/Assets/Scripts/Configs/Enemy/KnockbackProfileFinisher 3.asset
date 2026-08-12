@@ -17,4 +17,4 @@ MonoBehaviour:
   minSpeed: 0.3
   burstDuration: 0.041
   burstDragMultiplier: 0.271
-  maxDuration: 2
+  maxDuration: 2.78

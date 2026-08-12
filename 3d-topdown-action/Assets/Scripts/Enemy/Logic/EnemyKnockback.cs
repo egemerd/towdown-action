@@ -128,7 +128,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint, out Vector3 hitNormal))
             {
                 Debug.Log($"EnemyKnockback: Wall hit at {hitPoint} with normal {hitNormal}");
-                transform.position = hitPoint + hitNormal * 0.05f;
+                //transform.position = hitPoint + hitNormal * 0.05f;
 
                 // NOT: velocity'i sıfırlamıyoruz henüz — Bounce component event içinde 
                 //      CurrentVelocity'yi okuyup direction hesaplayacak.
