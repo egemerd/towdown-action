@@ -19,6 +19,7 @@ public class EnemyDashAttack : MonoBehaviour
     bool isDashing = false;
     Coroutine dashCoroutine;
     Vector3 target;
+    Vector3 enemyDirection;
     EnemyDashState currentState;
 
     // Reset için orijinal deðerleri saklýyoruz
@@ -86,20 +87,28 @@ public class EnemyDashAttack : MonoBehaviour
         // === DASHING: hedef yönünü bir kere hesapla, smooth curve ile git ===
         currentState = EnemyDashState.Dashing;
 
+        
+
         Vector3 dashDirection = (target - transform.position).normalized;
+        enemyDirection = dashDirection; // diðer sistemler için yönü sakla
         Vector3 startPos = transform.position;
         float dashSlowSpeed = ((target - transform.position).magnitude + config.dashSlowOffset) / config.dashDuration;
         float dashPos = (target - transform.position).magnitude < config.dashDetectionRadius ? dashSlowSpeed : config.dashSpeed; ;
         Vector3 endPos = startPos + dashDirection * dashPos * config.dashDuration;
 
+        
+
         transform.DOScale(originalScale, config.resetDuration).SetEase(Ease.OutBack);
 
+        bool hasHitTarget = false;
         float elapsedTime = 0f;
         while (elapsedTime < config.dashDuration)
         {
             float t = elapsedTime / config.dashDuration;
             float curvedT = config.dashCurve.Evaluate(t); // AnimationCurve ile smooth kontrol
             transform.position = Vector3.Lerp(startPos, endPos, curvedT);
+            if (!hasHitTarget && TryDashAttackHit())
+                hasHitTarget = true;             
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -156,6 +165,30 @@ public class EnemyDashAttack : MonoBehaviour
         return false;
     }
 
+    bool TryDashAttackHit()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position + enemyDirection * config.dashRangeOffset, config.dashRange, config.playerLayerMask);
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Player"))
+            {
+                if (hit.TryGetComponent<IDamageable>(out var damageable))
+                {
+                    HitInfo info = HitInfo.FromAttack(
+                        source: transform.position,
+                        target: hit.ClosestPoint(transform.position),
+                        damage: config.dashDamage,
+                        knockback: 0f,
+                        knockbackConfig: null
+                    );
+                    damageable.TakeDamage(info);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void CancelDash(HitInfo hitInfo)
     {
         if (dashCoroutine != null)
@@ -181,6 +214,10 @@ public class EnemyDashAttack : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, config.dashDetectionRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position + enemyDirection * config.dashRangeOffset, config.dashRange);
     }
 }

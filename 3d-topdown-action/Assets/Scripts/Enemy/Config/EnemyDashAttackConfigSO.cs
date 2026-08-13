@@ -9,11 +9,15 @@ public class EnemyDashAttackConfigSO : ScriptableObject
 
     [Header("Dash Movement")]
     public float dashSpeed = 20f;
-    public float dashDamage = 20f;
     public float dashDuration = 0.4f;
     public float dashSlowOffset = 0.1f; // radius icindeyken playerdan ne kadar ileri gidecegi offset.
     public AnimationCurve dashCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     // dash boyunca hýzýn nasýl daðýlacaðý (ease-out için: hýzlý baþla, yavaþla)
+
+    [Header("Dash Attack")]
+    public float dashDamage = 20f;
+    public float dashRange = 1f;
+    public float dashRangeOffset = 0f;  
 
     [Header("Wind-up (Preparing)")]
     public float prepareDuration = 0.35f;    // shake + charge süresi
