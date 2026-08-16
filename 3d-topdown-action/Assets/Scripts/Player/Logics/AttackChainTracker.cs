@@ -98,11 +98,26 @@ public class AttackChainTracker : MonoBehaviour
         if (multiplierProfile == null) return 1f;
         return multiplierProfile.GetKnockbackMultiplier(currentChainIndex);
     }
+   
+    public bool IsCurrentAttackHeavyKnockback()
+    {
+        if (multiplierProfile == null) return false;
+        return multiplierProfile.IsHeavyKnockback(currentChainIndex);
+    }
 
     public EnemyKnockbackConfigSO GetCurrentKnockbackConfig()
     {
         if (multiplierProfile == null) return null;    
         return multiplierProfile.GetKnockbackConfig(currentChainIndex);
-        
+    }
+
+    /// <summary>
+    /// Burasý eger enemy dashteyse knockback olmasý iciin kullanýlacak
+    /// </summary>
+
+    public EnemyKnockbackConfigSO GetHeavyKnockbackConfig()
+    {
+        if (multiplierProfile == null) return null;
+        return multiplierProfile.GetHeavyKnockbackConfig();
     }
 }

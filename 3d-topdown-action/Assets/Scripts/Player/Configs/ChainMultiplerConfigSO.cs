@@ -42,12 +42,25 @@ public class ChainMultiplierProfileSO : ScriptableObject
         return GetMultiplierAt(knockbackMultipliers, chainIndex);
     }
 
+ 
     public EnemyKnockbackConfigSO GetKnockbackConfig(int chainIndex)
     {
         if (knockbackConfigs == null || knockbackConfigs.Length == 0) return null;
         int arrayIndex = Mathf.Clamp(chainIndex - 1, 0, knockbackConfigs.Length - 1);
         //Debug.Log($"GetKnockbackConfig: chainIndex={chainIndex}, arrayIndex={arrayIndex}, config={knockbackConfigs[arrayIndex]}");
         return knockbackConfigs[arrayIndex];
+    }
+
+    public EnemyKnockbackConfigSO GetHeavyKnockbackConfig()
+    {
+        float index = knockbackConfigs.Length - 1;
+        return knockbackConfigs[(int)index];
+    }
+
+    public bool IsHeavyKnockback(int chainIndex)
+    {
+        int lastIndex = knockbackConfigs.Length - 1;
+        return (chainIndex - 1) == lastIndex;
     }
 
     public float GetDamageMultiplier(int chainIndex)
@@ -73,4 +86,6 @@ public class ChainMultiplierProfileSO : ScriptableObject
         int arrayIndex = Mathf.Clamp(chainIndex - 1, 0, array.Length - 1);
         return array[arrayIndex];
     }
+
+    
 }

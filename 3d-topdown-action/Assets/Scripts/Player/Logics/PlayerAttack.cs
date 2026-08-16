@@ -193,11 +193,13 @@ public class PlayerAttack : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(attackCenter, data.radius, data.targetLayer);
 
         bool hitNewEnemy = false;
+        bool canKnockbackAttack = false;
         foreach (var col in hits)
         {
             if (col.TryGetComponent<IDamageable>(out var checkDamageable) && !alreadyHitThisAttack.Contains(checkDamageable))
             {
                 hitNewEnemy = true;
+                canKnockbackAttack = col.TryGetComponent<EnemyDashAttack>(out var enemyDashAttack) && enemyDashAttack.CanBounceAttackInDash;
                 break; // Bir tane yeni hedef bulmamız chain'i artırmak için yeterli
             }
         }
@@ -209,7 +211,18 @@ public class PlayerAttack : MonoBehaviour
         }
 
         // 3. ŞİMDİ EN GÜNCEL CONFIG'İ ÇEKİYORUZ (Index zaten bir üst satırda artmış oldu)
-        EnemyKnockbackConfigSO enemyKnockbackConfigSO = chainTracker != null ? chainTracker.GetCurrentKnockbackConfig() : null;
+        EnemyKnockbackConfigSO enemyKnockbackConfigSO;
+        
+        if (canKnockbackAttack)
+        {
+            enemyKnockbackConfigSO = chainTracker != null ? chainTracker.GetHeavyKnockbackConfig() : null;
+            
+        }
+        else
+        {
+            enemyKnockbackConfigSO = chainTracker != null ? chainTracker.GetCurrentKnockbackConfig() : null;
+        }
+            
 
         foreach (var col in hits)
         {
@@ -225,7 +238,9 @@ public class PlayerAttack : MonoBehaviour
                 target: hitPos,
                 damage: data.damage,
                 knockback: data.knockbackForce,
-                knockbackConfig: enemyKnockbackConfigSO
+                knockbackConfig: enemyKnockbackConfigSO,
+                chainIndex: chainTracker != null ? chainTracker.CurrentChainIndex : 0,
+                isKnockedAttack: canKnockbackAttack || (chainTracker != null && chainTracker.IsCurrentAttackHeavyKnockback())
             );
 
             damageable.TakeDamage(info);

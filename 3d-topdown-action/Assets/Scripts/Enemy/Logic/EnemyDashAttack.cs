@@ -6,7 +6,8 @@ public enum EnemyDashState
     Idle,
     Preparing,
     Dashing,
-    Cooldown
+    Cooldown,
+    KnockedBack, //bu knockback cancel knockbacki 
 }
 public class EnemyDashAttack : MonoBehaviour
 {
@@ -27,10 +28,15 @@ public class EnemyDashAttack : MonoBehaviour
     Color originalColor;
     MaterialPropertyBlock mpb;
     static readonly int MainColor = Shader.PropertyToID("_MainColor");
+    EnemyKnockback enemyKnockback;
+    public bool CanBounceAttackInDash => currentState == EnemyDashState.Dashing;
+    public bool IsDashing => isDashing;
+
 
     private void Awake()
     {
         enemyHealth = GetComponent<EnemyHealth>();
+        enemyKnockback = GetComponent<EnemyKnockback>();
     }
     private void Start()
     {
@@ -41,14 +47,18 @@ public class EnemyDashAttack : MonoBehaviour
     private void OnEnable()
     {
         enemyHealth.OnDamageTaken += CancelDash;
+        enemyKnockback.OnKnockbackEnded += HandleKnockbackEnd;
     }
 
     private void OnDisable()
     {
         enemyHealth.OnDamageTaken -= CancelDash;
+        enemyKnockback.OnKnockbackEnded -= HandleKnockbackEnd;
     }
     private void Update()
     {
+        if (currentState != EnemyDashState.Idle)
+            return;
         if (DetectPlayer())
         {
             Debug.Log("Player detected, starting dash");
@@ -65,11 +75,17 @@ public class EnemyDashAttack : MonoBehaviour
         dashCoroutine = StartCoroutine(DashCoroutine());    
     }
 
+    void HandleKnockbackEnd()
+    {
+        if (currentState == EnemyDashState.KnockedBack)
+        {
+            currentState = EnemyDashState.Idle;
+        }
+    }
     private IEnumerator DashCoroutine()
     {   
         Debug.Log("DashCoroutine started");
         isDashing = true;
-
         // === PREPARING: shake + scale down + grileþ ===
         currentState = EnemyDashState.Preparing;
 
@@ -179,7 +195,9 @@ public class EnemyDashAttack : MonoBehaviour
                         target: hit.ClosestPoint(transform.position),
                         damage: config.dashDamage,
                         knockback: 0f,
-                        knockbackConfig: null
+                        knockbackConfig: null,
+                        chainIndex: 0f,
+                        isKnockedAttack: false
                     );
                     damageable.TakeDamage(info);
                     return true;
@@ -193,6 +211,7 @@ public class EnemyDashAttack : MonoBehaviour
     {
         if (dashCoroutine != null)
         {
+            
             StopCoroutine(dashCoroutine);
             transform.DOKill();
             DOTween.Kill(this); // renk tween'ini de kes
@@ -207,9 +226,27 @@ public class EnemyDashAttack : MonoBehaviour
             //}
 
             isDashing = false;
-            currentState = EnemyDashState.Idle;
+
+            if (hitInfo.isKnockedAttack)
+            {
+                currentState = EnemyDashState.KnockedBack;
+                // Knockback bittiðinde OnKnockbackEnded event'i state'i Idle yapacak
+            }
+            else
+            {
+                // Kýsa bir cancel cooldown ver, yoksa Update anýnda yeni dash baþlatýr
+                StartCoroutine(CancelCooldownCoroutine());
+            }
+
             dashCoroutine = null;
         }
+    }
+
+    private IEnumerator CancelCooldownCoroutine()
+    {
+        currentState = EnemyDashState.Cooldown;
+        yield return new WaitForSeconds(config.dashCooldown);
+        currentState = EnemyDashState.Idle;
     }
 
     private void OnDrawGizmos()

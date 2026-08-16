@@ -33,7 +33,9 @@ public class EnemyProjectile : MonoBehaviour
                 target: other.ClosestPoint(transform.position),
                 damage: damage,
                 knockback: 0f,
-                knockbackConfig: null
+                knockbackConfig: null,
+                chainIndex: 0f,
+                isKnockedAttack: false
             );
             damageable.TakeDamage(info);
         }

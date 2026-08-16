@@ -17,7 +17,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   dashSpeed: 15
-  dashDamage: 20
   dashDuration: 0.5
   dashSlowOffset: 1
   dashCurve:
@@ -44,6 +43,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  dashDamage: 20
+  dashRange: 0.55
+  dashRangeOffset: 1.01
   prepareDuration: 1
   prepareScale: {x: 0.4, y: 0.4, z: 0.4}
   shakeStrength: {x: 0.4, y: 0.4, z: 0.4}

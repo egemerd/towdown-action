@@ -7,8 +7,10 @@ public struct HitInfo
     public Vector3 hitPosition;
     public Vector3 hitDirection;
     public float knockbackForce;
+    public float chainIndex;
+    public bool isKnockedAttack;
 
-    public static HitInfo FromAttack(Vector3 source, Vector3 target, float damage, float knockback, EnemyKnockbackConfigSO knockbackConfig)
+    public static HitInfo FromAttack(Vector3 source, Vector3 target, float damage, float knockback, EnemyKnockbackConfigSO knockbackConfig, float chainIndex ,bool isKnockedAttack)
     {
         Vector3 dir = target - source;
         dir.y = 0;
@@ -21,7 +23,9 @@ public struct HitInfo
             hitPosition = target,
             hitDirection = dir,
             knockbackForce = knockback,
-            knockbackConfig = knockbackConfig
+            knockbackConfig = knockbackConfig,
+            chainIndex = chainIndex,
+            isKnockedAttack = isKnockedAttack
         };
     }
 }
