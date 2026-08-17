@@ -1,115 +1,75 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 public class CameraFollow : MonoBehaviour
 {
     [Header("References")]
+    [Tooltip("Deadzone'un merkezi. Kameranın 'rest' pozisyonu bunun etrafında sabitlenir.")]
     [SerializeField] private Transform target;
+
+    [Tooltip("Takip edilecek karakter. Deadzone testi bunun pozisyonuna göre yapılır.")]
+    [SerializeField] private Transform player;
+
     [SerializeField] private CameraFollowConfigSO config;
 
-    [Tooltip("Optional. If null, the camera's start position is used as the anchor.")]
-    [SerializeField] private Transform anchor;
+    // Runtime
+    private Vector3 restOffset;   // Startta kamera target'a göre neredeyse orası "rest"
+    private Vector3 velocity;     // SmoothDamp state
 
-    private Camera cam;
-    private Vector3 anchorPosition;
-    private Vector3 currentVelocity;
-
-    // Camera-space axes projected onto the ground plane (XZ).
-    private Vector3 depthAxis;   // camera forward, flattened → "up on screen"
-    private Vector3 rightAxis;   // camera right,   flattened → "right on screen"
-
-    private float baseFOV;
-    private float baseOrthoSize;
-    private float currentZoom;
-    private float zoomVelocity;
-
-    private void Awake()
+    private void Start()
     {
-        cam = GetComponent<Camera>();
-        anchorPosition = anchor ? anchor.position : transform.position;
-
-        baseFOV = cam.fieldOfView;
-        baseOrthoSize = cam.orthographicSize;
-
-        depthAxis = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-        rightAxis = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
+        if (target == null) return;
+        // Kameranın sahnedeki başlangıç konumunu target'a göre kilitle.
+        // Deadzone içindeyken kamera hep buraya döner.
+        restOffset = transform.position - target.position;
     }
 
     private void LateUpdate()
     {
-        if (target == null || config == null) return;
+        if (target == null || player == null || config == null) return;
 
-        // Player offset from anchor on the ground plane.
-        Vector3 offset = target.position - anchorPosition;
-        Vector3 flatOffset = Vector3.ProjectOnPlane(offset, Vector3.up);
+        // 1) Player'ın target'a göre yerel konumu
+        Vector3 local = player.position - target.position;
+        float halfW = config.deadzoneWidth * 0.5f;
+        float halfD = config.deadzoneDepth * 0.5f;
 
-        // Deadzone: subtract the radius so we don't get a snap when leaving it.
-        float mag = flatOffset.magnitude;
-        if (mag < config.deadzoneRadius)
-            flatOffset = Vector3.zero;
-        else
-            flatOffset -= flatOffset.normalized * config.deadzoneRadius;
+        // 2) Deadzone DIŞINA taşan miktarı bul. İçindeyse 0.
+        //    Örn: local.x = 5, halfW = 2 → excessX = +3
+        //         local.x = 1, halfW = 2 → excessX =  0
+        float excessX = Mathf.Max(0f, Mathf.Abs(local.x) - halfW) * Mathf.Sign(local.x);
+        float excessZ = Mathf.Max(0f, Mathf.Abs(local.z) - halfD) * Mathf.Sign(local.z);
+        Vector3 excess = new Vector3(excessX, 0f, excessZ);
 
-        // Depth factor: 0 near camera, 1 far from camera. Player position along depth axis.
-        float depthDot = Vector3.Dot(offset, depthAxis);
-        float depthT = Mathf.Clamp01(Mathf.InverseLerp(config.depthRange.x, config.depthRange.y, depthDot));
-        float curvedT = config.depthCurve.Evaluate(depthT);
-        float depthBoost = 1f + curvedT * config.depthMultiplier;
+        // 3) Drift = excess * multiplier, sonra max mesafeye clamp
+        Vector3 drift = excess * config.driftAmount;
+        drift = Vector3.ClampMagnitude(drift, config.maxDriftDistance);
 
-        // Desired drift in world space.
-        Vector3 desiredDrift = flatOffset * config.baseFollowAmount * depthBoost;
+        // 4) Hedef pozisyon = rest + drift (Y kilitli)
+        Vector3 restPosition = target.position + restOffset;
+        Vector3 desired = new Vector3(
+            restPosition.x + drift.x,
+            restPosition.y,   // Y sabit
+            restPosition.z + drift.z
+        );
 
-        // Clamp along camera-local axes so limits stay intuitive regardless of world rotation.
-        float rightComp = Vector3.Dot(desiredDrift, rightAxis);
-        float depthComp = Vector3.Dot(desiredDrift, depthAxis);
-        rightComp = Mathf.Clamp(rightComp, -config.maxDrift.x, config.maxDrift.x);
-        depthComp = Mathf.Clamp(depthComp, -config.maxDrift.y, config.maxDrift.y);
-        desiredDrift = rightAxis * rightComp + depthAxis * depthComp;
-
-        Vector3 desiredPosition = anchorPosition + desiredDrift;
-        desiredPosition.y = anchorPosition.y; // keep camera height locked to the anchor
-
+        // 5) SmoothDamp — deadzone'a girince drift = 0 olur, kamera restPosition'a döner
         transform.position = Vector3.SmoothDamp(
-            transform.position, desiredPosition, ref currentVelocity, config.smoothTime);
-
-        // Zoom based on depth factor (not on drift), so it responds to player's actual distance.
-        if (config.enableZoom)
-        {
-            float targetZoom = curvedT * config.zoomAmount;
-            currentZoom = Mathf.SmoothDamp(currentZoom, targetZoom, ref zoomVelocity, config.zoomSmoothTime);
-
-            if (cam.orthographic)
-                cam.orthographicSize = Mathf.Max(0.1f, baseOrthoSize + currentZoom);
-            else
-                cam.fieldOfView = Mathf.Clamp(baseFOV + currentZoom, 5f, 120f);
-        }
+            transform.position,
+            desired,
+            ref velocity,
+            config.smoothTime
+        );
     }
 
-    // Optional runtime helpers
-    public void SetAnchorToCurrent() => anchorPosition = transform.position;
-    public void SetTarget(Transform t) => target = t;
-
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
-        Vector3 a = Application.isPlaying
-            ? anchorPosition
-            : (anchor ? anchor.position : transform.position);
+        if (target == null || config == null) return;
 
-        if (config == null) return;
+        Gizmos.color = new Color(0f, 1f, 0f, 0.25f);
+        Vector3 center = target.position;
+        Vector3 size = new Vector3(config.deadzoneWidth, 0.1f, config.deadzoneDepth);
+        Gizmos.DrawCube(center, size);
 
-        Gizmos.color = new Color(1f, 0.9f, 0.2f, 0.9f);
-        Gizmos.DrawWireSphere(a, config.deadzoneRadius);
-
-        Gizmos.color = new Color(0.2f, 0.8f, 1f, 0.8f);
-        Vector3 r = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
-        Vector3 f = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-        Vector3[] pts =
-        {
-            a + r * config.maxDrift.x + f * config.maxDrift.y,
-            a - r * config.maxDrift.x + f * config.maxDrift.y,
-            a - r * config.maxDrift.x - f * config.maxDrift.y,
-            a + r * config.maxDrift.x - f * config.maxDrift.y
-        };
-        for (int i = 0; i < 4; i++) Gizmos.DrawLine(pts[i], pts[(i + 1) % 4]);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(center, size);
     }
 }
