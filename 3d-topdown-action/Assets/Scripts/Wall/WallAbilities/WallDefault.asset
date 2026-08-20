@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0d166a29ac4f54e9e7e3e83e3b67e4, type: 3}
   m_Name: WallDefault
   m_EditorClassIdentifier: Assembly-CSharp::WallStrongBounceAbilitySO
-  bounceConfig: {fileID: 11400000, guid: dd6eb15c0f19bc94f9a7b824dc8eee20, type: 2}
+  bounceConfig: {fileID: 11400000, guid: 6a62e46f40ea0a246a340109fb644fad, type: 2}

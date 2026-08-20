@@ -5,9 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyKnockback))]
 public class EnemyBounce : MonoBehaviour
 {
-    [Header("Config")]
-    [SerializeField] private EnemyBounceConfigSO config;
-
     private EnemyKnockback knockback;
     private int bounceCount;
     private Coroutine bounceRoutine;
@@ -18,8 +15,7 @@ public class EnemyBounce : MonoBehaviour
     private void Awake()
     {
         knockback = GetComponent<EnemyKnockback>();
-        if (config == null)
-            Debug.LogError($"[EnemyBounce] Config atanmamış! {name}", this);
+        
     }
 
     private void OnEnable()
@@ -50,8 +46,13 @@ public class EnemyBounce : MonoBehaviour
 
     private void HandleWallHit(Vector3 hitPoint, Vector3 hitNormal, Wall wall)
     {
-        if (config == null) return;
+        EnemyBounceConfigSO config = wall.wallAbility is IWallBounceConfig bounceConfig ? bounceConfig.BounceConfig : null;
 
+        if (config == null)
+        {
+            Debug.LogWarning($"[EnemyBounce] Wall {wall.name} does not have a valid bounce config. Skipping bounce.");
+            return;
+        }
         Vector3 incomingVelocity = knockback.CurrentVelocity;
 
         // Limit checks — bunlar için CLAIM YAPMIYORUZ, knockback normal şekilde bitmesine izin veriyoruz
@@ -94,20 +95,20 @@ public class EnemyBounce : MonoBehaviour
 
         // Impact pause + resume
         if (bounceRoutine != null) StopCoroutine(bounceRoutine);
-        bounceRoutine = StartCoroutine(BounceWithPause(finalVelocity, hitPoint, hitNormal, wall));
+        bounceRoutine = StartCoroutine(BounceWithPause(finalVelocity, hitPoint, hitNormal, wall, config.impactPauseDuration));
     }
 
     
 
-    private IEnumerator BounceWithPause(Vector3 finalVelocity, Vector3 hitPoint, Vector3 hitNormal, Wall wall)
+    private IEnumerator BounceWithPause(Vector3 finalVelocity, Vector3 hitPoint, Vector3 hitNormal, Wall wall, float duration)
     {
-        if (config.impactPauseDuration > 0f)
-            yield return new WaitForSeconds(config.impactPauseDuration);
+        if (duration > 0f)
+            yield return new WaitForSeconds(duration);
 
-        EnemyKnockbackConfigSO wallBounceConfig = wall.wallAbility is IWallBounceConfig bounceConfig ? bounceConfig.BounceConfig : null;
+        EnemyBounceConfigSO wallBounceConfig = wall.wallAbility is IWallBounceConfig bounceConfig ? bounceConfig.BounceConfig : null;
         Debug.Log($"[EnemyBounce] wallBounceConfig: {(wallBounceConfig == null ? "NULL" : wallBounceConfig.name)}, wall.wallAbility: {wall.wallAbility}");
         OnBounced?.Invoke(hitPoint, finalVelocity);
-        knockback.ResumeKnockback(finalVelocity, wallBounceConfig);
+        knockback.ResumeKnockback(finalVelocity);
         bounceRoutine = null;
     }
 }
