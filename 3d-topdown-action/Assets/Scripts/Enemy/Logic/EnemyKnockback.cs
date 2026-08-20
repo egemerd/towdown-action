@@ -47,7 +47,7 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
     public event Action<Vector3> OnKnockbackApplied;
     public event Action OnKnockbackEnded;
     public event Action OnThresholdReached;
-    public event Action<Vector3,Vector3> OnWallHit;
+    public event Action<Vector3,Vector3,Wall> OnWallHit;
 
     private void Awake()
     {
@@ -125,19 +125,18 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
             Vector3 delta = currentVelocity * dt;
 
             // Wall check — hareket ETMEDEN önce doğrula
-            if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint, out Vector3 hitNormal))
+            if (CheckWallHit(previousPosition, delta, out Vector3 hitPoint, out Vector3 hitNormal, out Wall wall))
             {
                 Debug.Log($"EnemyKnockback: Wall hit at {hitPoint} with normal {hitNormal}");
                 //transform.position = hitPoint + hitNormal * 0.05f;
-
-                var bounceEffect = GetComponent<WallBounceEffect>();
 
                 // NOT: velocity'i sıfırlamıyoruz henüz — Bounce component event içinde 
                 //      CurrentVelocity'yi okuyup direction hesaplayacak.
                 knockbackRoutine = null;
                 pendingResume = false; // temiz slate — dinleyicilerden birinin claim etmesini bekliyoruz
+                
 
-                OnWallHit?.Invoke(hitPoint, hitNormal);
+                OnWallHit?.Invoke(hitPoint, hitNormal,wall);
 
                 if (!pendingResume)
                 {
@@ -185,10 +184,11 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
     }
 
     private bool CheckWallHit(Vector3 fromPosition, Vector3 delta,
-                          out Vector3 hitPoint, out Vector3 hitNormal)
+                          out Vector3 hitPoint, out Vector3 hitNormal ,out Wall wall)
     {
         hitPoint = default;
         hitNormal = default;
+        wall = null;
         if (wallLayer == 0 || delta.sqrMagnitude < 0.0001f) return false;
 
         float castDistance = delta.magnitude;
@@ -200,7 +200,8 @@ public class EnemyKnockback : MonoBehaviour, IKnockable
         {
             hit.collider.gameObject.GetComponent<WallBounceEffect>().BounceEffect();
             hitPoint = hit.point;
-            hitNormal = hit.normal;   
+            hitNormal = hit.normal;
+            wall = hit.collider.GetComponent<Wall>();
             return true;
         }
         return false;

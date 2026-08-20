@@ -48,7 +48,7 @@ public class EnemyBounce : MonoBehaviour
 
     
 
-    private void HandleWallHit(Vector3 hitPoint, Vector3 hitNormal)
+    private void HandleWallHit(Vector3 hitPoint, Vector3 hitNormal, Wall wall)
     {
         if (config == null) return;
 
@@ -94,18 +94,20 @@ public class EnemyBounce : MonoBehaviour
 
         // Impact pause + resume
         if (bounceRoutine != null) StopCoroutine(bounceRoutine);
-        bounceRoutine = StartCoroutine(BounceWithPause(finalVelocity, hitPoint, hitNormal));
+        bounceRoutine = StartCoroutine(BounceWithPause(finalVelocity, hitPoint, hitNormal, wall));
     }
 
     
 
-    private IEnumerator BounceWithPause(Vector3 finalVelocity, Vector3 hitPoint, Vector3 hitNormal)
+    private IEnumerator BounceWithPause(Vector3 finalVelocity, Vector3 hitPoint, Vector3 hitNormal, Wall wall)
     {
         if (config.impactPauseDuration > 0f)
             yield return new WaitForSeconds(config.impactPauseDuration);
 
+        EnemyKnockbackConfigSO wallBounceConfig = wall.wallAbility is IWallBounceConfig bounceConfig ? bounceConfig.BounceConfig : null;
+        Debug.Log($"[EnemyBounce] wallBounceConfig: {(wallBounceConfig == null ? "NULL" : wallBounceConfig.name)}, wall.wallAbility: {wall.wallAbility}");
         OnBounced?.Invoke(hitPoint, finalVelocity);
-        knockback.ResumeKnockback(finalVelocity);
+        knockback.ResumeKnockback(finalVelocity, wallBounceConfig);
         bounceRoutine = null;
     }
 }

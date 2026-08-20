@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WallEdgeless (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5009124510407896365, guid: 1c96f9805184e1345be8daf7f6e88e49, type: 3}
+      propertyPath: wallAbility
+      value: 
+      objectReference: {fileID: 11400000, guid: fcfe1ccee23c3af449cb8b1892aac733, type: 2}
     - target: {fileID: 8943874136949026135, guid: 1c96f9805184e1345be8daf7f6e88e49, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.38
@@ -6872,6 +6876,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wall (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2154938884806946426, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.6
+      objectReference: {fileID: 0}
     - target: {fileID: 8943874136949026135, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.84194
@@ -8929,9 +8937,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 90638667727489002, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
+      propertyPath: wallAbility
+      value: 
+      objectReference: {fileID: 11400000, guid: cdbf2b83a58e4fe4d836f29f0022f024, type: 2}
     - target: {fileID: 790851208562582390, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
       propertyPath: m_Name
       value: Wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154938884806946426, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 8943874136949026135, guid: 27177b565ff7c15408be1abfdcbe60cc, type: 3}
       propertyPath: m_LocalPosition.x
