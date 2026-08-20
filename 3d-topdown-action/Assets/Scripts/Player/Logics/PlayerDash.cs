@@ -48,6 +48,8 @@ public class PlayerDash : MonoBehaviour
     [SerializeField] private MonoBehaviour aimSourceComponent;
     private IAimSource aimSource;
 
+    [SerializeField] private GameObject dashTrailPrefab;
+
     // Cached components
     private PlayerInput playerInput;
     private InputAction dashAction;
@@ -211,7 +213,7 @@ public class PlayerDash : MonoBehaviour
             //playerSquash.TriggerSquash(direction, config.squashProfile);
 
         SpawnTrail();
-
+        
         // === Wall detection (öncekiyle aynı) ===
         Vector3 startPosition = transform.position;
         float actualDistance = ResolveDashDistance(startPosition, direction);
@@ -319,6 +321,7 @@ public class PlayerDash : MonoBehaviour
 
         Vector3 spawnPos = transform.position + transform.rotation * config.trailSpawnOffset;
         GameObject trail = Instantiate(config.trailPrefab, spawnPos, transform.rotation);
+        trail.transform.parent = transform;
         Destroy(trail, config.trailLifetime);
     }
 

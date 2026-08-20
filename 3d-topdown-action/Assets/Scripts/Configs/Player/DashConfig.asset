@@ -19,8 +19,8 @@ MonoBehaviour:
   iframeDuration: 0.16
   cooldown: 0.2
   endSpeed: 6
-  trailPrefab: {fileID: 0}
-  trailLifetime: 0.8
+  trailPrefab: {fileID: 3483196504270069741, guid: f335cae68e8de0648851514f9f7b8f2b, type: 3}
+  trailLifetime: 0.57
   trailSpawnOffset: {x: 0, y: 0, z: 0}
   squashProfile: {fileID: 11400000, guid: f2f21dd9bb2fa70408dbe37497fde036, type: 2}
   wallLayer:

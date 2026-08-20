@@ -697,7 +697,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5691328435424053603, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: target
@@ -1017,7 +1017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2e4d4462e2314468b23f73527fa218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  target: {fileID: 558730962}
+  target: {fileID: 1986121796}
   player: {fileID: 1353268255}
   config: {fileID: 11400000, guid: e4d42ffae3b4bae438cfccdb8029c817, type: 2}
 --- !u!1001 &547599900
@@ -1038,7 +1038,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5691328435424053603, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5889650754104817743, guid: 441d873549261734192061223b7b2ba0, type: 3}
       propertyPath: target
@@ -7809,7 +7809,7 @@ Transform:
   m_GameObject: {fileID: 1353268248}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.75, y: -5.41, z: 9.95}
+  m_LocalPosition: {x: 2.39, y: -5.41, z: 8.46}
   m_LocalScale: {x: 0.77019, y: 0.77019, z: 0.77019}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7978,6 +7978,7 @@ MonoBehaviour:
   dashBuffer:
     bufferDuration: 0.15
   aimSourceComponent: {fileID: 1353268259}
+  dashTrailPrefab: {fileID: 0}
 --- !u!114 &1353268266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8889,6 +8890,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1986121795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1986121796}
+  m_Layer: 0
+  m_Name: BossTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1986121796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986121795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.09426, y: -7.2, z: 12.22}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &793584043179358529
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9243,3 +9275,4 @@ SceneRoots:
   - {fileID: 880753513}
   - {fileID: 1920316523}
   - {fileID: 71165010}
+  - {fileID: 1986121796}
